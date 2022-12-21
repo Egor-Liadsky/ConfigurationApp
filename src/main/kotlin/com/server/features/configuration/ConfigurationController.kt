@@ -1,7 +1,7 @@
 package com.server.features.configuration
 
+import com.server.database.dao.dao
 import com.server.database.configuration.ConfigurationDTO
-import com.server.database.configuration.ConfigurationEntity
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -12,7 +12,7 @@ class ConfigurationController(private val call: ApplicationCall) {
     suspend fun createConfiguration() {
         val configurationReceive = call.receive<ConfigurationReceive>()
 
-        ConfigurationEntity.insert(
+       dao.createConfiguration(
             ConfigurationDTO(
                 id = 0,
                 title = configurationReceive.title,
@@ -20,15 +20,14 @@ class ConfigurationController(private val call: ApplicationCall) {
                 colorText = configurationReceive.colorText
             )
         )
-
         call.respond(HttpStatusCode.Created, "Configuration create")
     }
 
     suspend fun getConfiguration(id: Int) {
-        call.respond(HttpStatusCode.OK, ConfigurationEntity.getConfiguration(id))
+        call.respond(HttpStatusCode.OK, dao.getConfiguration(id))
     }
 
     suspend fun getAllConfigurations() {
-        call.respond(HttpStatusCode.OK, ConfigurationEntity.getAllConfigurations())
+        call.respond(HttpStatusCode.OK, dao.getAllConfigurations())
     }
 }
