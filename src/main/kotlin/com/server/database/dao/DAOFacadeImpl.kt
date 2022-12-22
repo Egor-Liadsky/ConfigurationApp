@@ -1,29 +1,29 @@
 package com.server.database.dao
 
 import com.server.database.dao.DatabaseFactory.dbQuery
-import com.server.database.configuration.ConfigurationDTO
-import com.server.database.configuration.ConfigurationEntity
-import com.server.database.configuration.ConfigurationEntity.colorButton
-import com.server.database.configuration.ConfigurationEntity.colorText
-import com.server.database.configuration.ConfigurationEntity.rowId
-import com.server.database.configuration.ConfigurationEntity.title
+import com.server.database.models.ConfigurationModel
+import com.server.database.models.ConfigurationModel.colorButton
+import com.server.database.models.ConfigurationModel.colorText
+import com.server.database.models.ConfigurationModel.rowId
+import com.server.database.models.ConfigurationModel.title
+import com.server.features.configuration.ConfigurationReceive
 import com.server.features.configuration.ConfigurationResponse
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 
 class DAOFacadeImpl : DAOFacade {
-    override suspend fun createConfiguration(configurationDTO: ConfigurationDTO) = dbQuery {
-        ConfigurationEntity.insert {
-            it[title] = configurationDTO.title
-            it[colorButton] = configurationDTO.colorButton
-            it[colorText] = configurationDTO.colorText
+    override suspend fun createConfiguration(configurationReceive: ConfigurationReceive) = dbQuery {
+        ConfigurationModel.insert {
+            it[title] = configurationReceive.title
+            it[colorButton] = configurationReceive.colorButton
+            it[colorText] = configurationReceive.colorText
         }
         return@dbQuery
     }
 
     override suspend fun getConfiguration(id: Int): ConfigurationResponse = dbQuery {
-        val configurationEntity = ConfigurationEntity.select { rowId.eq(id) }.single()
+        val configurationEntity = ConfigurationModel.select { ConfigurationModel.rowId.eq(id) }.single()
         return@dbQuery ConfigurationResponse(
             id = id,
             title = configurationEntity[title],
@@ -32,8 +32,8 @@ class DAOFacadeImpl : DAOFacade {
         )
     }
 
-    override suspend fun getAllConfigurations(): List<ConfigurationResponse>  = dbQuery {
-        return@dbQuery ConfigurationEntity.selectAll().map {
+    override suspend fun getAllConfigurations(): List<ConfigurationResponse> = dbQuery {
+        return@dbQuery ConfigurationModel.selectAll().map {
             ConfigurationResponse(
                 id = it[rowId],
                 title = it[title],

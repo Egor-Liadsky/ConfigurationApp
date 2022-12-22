@@ -1,6 +1,6 @@
 package com.server.database.dao
 
-import com.server.database.configuration.ConfigurationEntity
+import com.server.database.models.ConfigurationModel
 import com.server.utils.Constants
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
@@ -15,7 +15,7 @@ object DatabaseFactory {
         val database = Database.connect(jdbcUrls, driverClass, user = Constants.userDb, password = Constants.passwordDb)
 
         transaction(database) {
-            SchemaUtils.create(ConfigurationEntity)
+            SchemaUtils.create(ConfigurationModel)
         }
     }
 

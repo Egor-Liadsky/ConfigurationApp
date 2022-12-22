@@ -13,8 +13,7 @@ class ConfigurationController(private val call: ApplicationCall) {
         val configurationReceive = call.receive<ConfigurationReceive>()
 
        dao.createConfiguration(
-            ConfigurationDTO(
-                id = 0,
+            ConfigurationReceive(
                 title = configurationReceive.title,
                 colorButton = configurationReceive.colorButton,
                 colorText = configurationReceive.colorText
