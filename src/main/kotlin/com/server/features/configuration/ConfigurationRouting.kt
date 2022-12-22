@@ -21,4 +21,16 @@ fun Route.configurationRouting() {
         val configurationController = ConfigurationController(call)
         configurationController.getAllConfigurations()
     }
+
+    delete("/configuration/{id?}") {
+        val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.NotFound, "Missing id")
+        val configurationController = ConfigurationController(call)
+        configurationController.deleteConfiguration(id.toInt())
+    }
+
+    put("/configuration/{id?}") {
+        val id = call.parameters["id"] ?: return@put call.respond(HttpStatusCode.NotFound, "Missing id")
+        val configurationController = ConfigurationController(call)
+        configurationController.updateConfiguration(id.toInt())
+    }
 }

@@ -1,7 +1,6 @@
 package com.server.features.configuration
 
 import com.server.database.dao.dao
-import com.server.database.configuration.ConfigurationDTO
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -12,7 +11,7 @@ class ConfigurationController(private val call: ApplicationCall) {
     suspend fun createConfiguration() {
         val configurationReceive = call.receive<ConfigurationReceive>()
 
-       dao.createConfiguration(
+        dao.createConfiguration(
             ConfigurationReceive(
                 title = configurationReceive.title,
                 colorButton = configurationReceive.colorButton,
@@ -28,5 +27,24 @@ class ConfigurationController(private val call: ApplicationCall) {
 
     suspend fun getAllConfigurations() {
         call.respond(HttpStatusCode.OK, dao.getAllConfigurations())
+    }
+
+    suspend fun deleteConfiguration(id: Int) {
+        call.respond(HttpStatusCode.OK, dao.deleteConfiguration(id))
+    }
+
+    suspend fun updateConfiguration(id: Int) {
+        val configurationResponse = call.receive<ConfigurationResponse>()
+        call.respond(
+            HttpStatusCode.OK, dao.updateConfiguration(
+                id,
+                ConfigurationResponse(
+                    id = id,
+                    title = configurationResponse.title,
+                    colorButton = configurationResponse.colorButton,
+                    colorText = configurationResponse.colorText
+                )
+            )
+        )
     }
 }

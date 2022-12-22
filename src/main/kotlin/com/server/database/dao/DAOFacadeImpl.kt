@@ -8,9 +8,8 @@ import com.server.database.models.ConfigurationModel.rowId
 import com.server.database.models.ConfigurationModel.title
 import com.server.features.configuration.ConfigurationReceive
 import com.server.features.configuration.ConfigurationResponse
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class DAOFacadeImpl : DAOFacade {
     override suspend fun createConfiguration(configurationReceive: ConfigurationReceive) = dbQuery {
@@ -23,12 +22,12 @@ class DAOFacadeImpl : DAOFacade {
     }
 
     override suspend fun getConfiguration(id: Int): ConfigurationResponse = dbQuery {
-        val configurationEntity = ConfigurationModel.select { ConfigurationModel.rowId.eq(id) }.single()
+        val configurationModel = ConfigurationModel.select { rowId.eq(id) }.single()
         return@dbQuery ConfigurationResponse(
             id = id,
-            title = configurationEntity[title],
-            colorButton = configurationEntity[colorButton],
-            colorText = configurationEntity[colorText]
+            title = configurationModel[title],
+            colorButton = configurationModel[colorButton],
+            colorText = configurationModel[colorText]
         )
     }
 
@@ -41,6 +40,26 @@ class DAOFacadeImpl : DAOFacade {
                 colorText = it[colorText]
             )
         }
+    }
+
+    override suspend fun deleteConfiguration(id: Int): Int = dbQuery {
+        ConfigurationModel.deleteWhere { rowId eq id }
+        return@dbQuery id
+    }
+
+    override suspend fun updateConfiguration(id: Int, configurationResponse: ConfigurationResponse): ConfigurationResponse = dbQuery {
+        ConfigurationModel.update({ rowId eq id }) {
+            it[rowId] = configurationResponse.id
+            it[title] = configurationResponse.title
+            it[colorButton] = configurationResponse.colorButton
+            it[colorText] = configurationResponse.colorText
+        }
+        return@dbQuery ConfigurationResponse(
+            id = id,
+            title = configurationResponse.title,
+            colorButton = configurationResponse.colorButton,
+            colorText = configurationResponse.colorText
+        )
     }
 }
 
